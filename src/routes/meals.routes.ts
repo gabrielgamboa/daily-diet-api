@@ -22,8 +22,6 @@ export async function mealsRoutes(app: FastifyInstance) {
         request.body,
       );
 
-      console.log({ name, description, isOnDiet, date });
-
       const userId = request.user?.id;
 
       await knex("meals").insert({
