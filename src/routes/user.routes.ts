@@ -4,7 +4,7 @@ import { knex } from "../database/config";
 import { randomUUID } from "crypto";
 
 export async function userRoutes(app: FastifyInstance) {
-  app.post("/users", async (request, reply) => {
+  app.post("/", async (request, reply) => {
     const createUserSchema = z.object({
       name: z.string().min(5),
       email: z.string(),

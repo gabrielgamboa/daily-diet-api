@@ -6,7 +6,7 @@ import { randomUUID } from "crypto";
 
 export async function mealsRoutes(app: FastifyInstance) {
   app.post(
-    "/meals",
+    "/",
     {
       preHandler: [checkIfUserIdExists],
     },
@@ -34,6 +34,20 @@ export async function mealsRoutes(app: FastifyInstance) {
       });
 
       return reply.status(201).send();
+    },
+  );
+
+  app.get(
+    "/",
+    {
+      preHandler: [checkIfUserIdExists],
+    },
+    async (request) => {
+      const userId = request.user.id;
+
+      const meals = await knex("meals").where("user_id", userId).select("*");
+
+      return { meals };
     },
   );
 }
