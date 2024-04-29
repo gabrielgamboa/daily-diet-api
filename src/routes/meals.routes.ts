@@ -50,4 +50,36 @@ export async function mealsRoutes(app: FastifyInstance) {
       return { meals };
     },
   );
+
+  app.put(
+    "/:id",
+    {
+      preHandler: [checkIfUserIdExists],
+    },
+    async (request, reply) => {
+      const paramSchema = z.object({ id: z.string().uuid() });
+      const { id } = paramSchema.parse(request.params);
+
+      const updateMealBodySchema = z.object({
+        name: z.string().optional(),
+        description: z.string().optional(),
+        isOnDiet: z.boolean().optional(),
+        date: z.coerce.date().optional(),
+      });
+
+      const body = updateMealBodySchema.parse(request.body);
+
+      await knex("meals")
+        .update({
+          ...(body.name && { name: body.name }),
+          ...(body.description && { description: body.description }),
+          ...(body.isOnDiet && { is_on_diet: body.isOnDiet }),
+          ...(body.date && { date: body.date }),
+        })
+        .where("id", id)
+        .where("user_id", request.cookies.userId);
+
+      return reply.status(204).send();
+    },
+  );
 }
