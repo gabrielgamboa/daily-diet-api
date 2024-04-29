@@ -7,6 +7,9 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "tsx --watch src/server.ts",
     "knex": "node --import tsx ./node_modules/knex/bin/cli.js --knexfile ./knexfile.ts",
+    "knex-migration": "npm run knex -- migrate:make",
+    "knex-migration-up": "npm run knex -- migrate:latest",
+    "knex-migration-down": "npm run knex -- migrate:rollback --all",
     "lint": "eslint **/*.ts"
   },
   "author": "",
