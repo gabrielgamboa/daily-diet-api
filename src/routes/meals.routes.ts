@@ -15,7 +15,7 @@ export async function mealsRoutes(app: FastifyInstance) {
         name: z.string(),
         description: z.string(),
         isOnDiet: z.boolean(),
-        date: z.coerce.date(), // todo: validate hour too
+        date: z.coerce.date(),
       });
 
       const { name, description, isOnDiet, date } = createMealBodySchema.parse(
