@@ -76,8 +76,7 @@ export async function mealsRoutes(app: FastifyInstance) {
           ...(body.isOnDiet && { is_on_diet: body.isOnDiet }),
           ...(body.date && { date: body.date }),
         })
-        .where("id", id)
-        .where("user_id", request.cookies.userId);
+        .where("id", id);
 
       return reply.status(204).send();
     },
