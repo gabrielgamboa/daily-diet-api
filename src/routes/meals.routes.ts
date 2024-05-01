@@ -69,6 +69,10 @@ export async function mealsRoutes(app: FastifyInstance) {
 
       const body = updateMealBodySchema.parse(request.body);
 
+      const meal = await knex("meals").where("id", id).first();
+
+      if (!meal) return reply.status(404).send({ error: "Meal not found" });
+
       await knex("meals")
         .update({
           ...(body.name && { name: body.name }),
@@ -93,7 +97,28 @@ export async function mealsRoutes(app: FastifyInstance) {
 
       const meal = await knex("meals").where("id", id).first();
 
+      if (!meal) return reply.status(404).send({ error: "Meal not found" });
+
       return { meal };
+    },
+  );
+
+  app.delete(
+    "/:id",
+    {
+      preHandler: [checkIfUserIdExists],
+    },
+    async (request, reply) => {
+      const paramSchema = z.object({ id: z.string().uuid() });
+      const { id } = paramSchema.parse(request.params);
+
+      const meal = await knex("meals").where("id", id).first();
+
+      if (!meal) return reply.status(404).send({ error: "Meal not found" });
+
+      await knex("meals").where("id", id).del();
+
+      return reply.status(204).send();
     },
   );
 }
