@@ -121,4 +121,69 @@ export async function mealsRoutes(app: FastifyInstance) {
       return reply.status(204).send();
     },
   );
+
+  app.get(
+    "/metrics",
+    {
+      preHandler: [checkIfUserIdExists],
+    },
+    async (request, reply) => {
+      const { id } = request.user;
+
+      const totalMealsRegistered = await knex("meals")
+        .where("user_id", id)
+        .count("*", { as: "count" })
+        .first();
+
+      const totalMealsRegisteredOnDiet = await knex("meals")
+        .where({
+          user_id: id,
+          is_on_diet: true,
+        })
+        .count("*", { as: "count" })
+        .first();
+
+      const totalMealsRegisteredNotOnDiet = await knex("meals")
+        .where({
+          user_id: id,
+          is_on_diet: false,
+        })
+        .count("*", { as: "count" })
+        .first();
+
+      const mealsFromUser = await knex("meals")
+        .where({
+          user_id: id,
+        })
+        .orderBy("created_at", "asc")
+        .select("*");
+
+      const { bestSequenceOnDiet } = mealsFromUser.reduce(
+        (acc, meal) => {
+          console.log(acc, meal);
+
+          if (meal.is_on_diet) {
+            acc.sequence++;
+          } else {
+            acc.sequence = 0;
+          }
+
+          if (acc.sequence > acc.bestSequenceOnDiet) {
+            acc.bestSequenceOnDiet = acc.sequence;
+          }
+
+          return acc;
+        },
+
+        { bestSequenceOnDiet: 0, sequence: 0 },
+      );
+
+      return reply.send({
+        totalMealsRegistered: totalMealsRegistered?.count,
+        totalMealsRegisteredOnDiet: totalMealsRegisteredOnDiet?.count,
+        totalMealsRegisteredNotOnDiet: totalMealsRegisteredNotOnDiet?.count,
+        bestSequenceOnDiet,
+      });
+    },
+  );
 }
