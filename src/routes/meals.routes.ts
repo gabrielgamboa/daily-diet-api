@@ -81,4 +81,19 @@ export async function mealsRoutes(app: FastifyInstance) {
       return reply.status(204).send();
     },
   );
+
+  app.get(
+    "/:id",
+    {
+      preHandler: [checkIfUserIdExists],
+    },
+    async (request, reply) => {
+      const paramSchema = z.object({ id: z.string().uuid() });
+      const { id } = paramSchema.parse(request.params);
+
+      const meal = await knex("meals").where("id", id).first();
+
+      return { meal };
+    },
+  );
 }
