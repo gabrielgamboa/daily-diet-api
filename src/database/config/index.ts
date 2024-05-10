@@ -1,10 +1,12 @@
 import { knex as setupKnex, Knex } from "knex";
+import path from "path";
+import { env } from "../../env";
 
 export const databaseConfig: Knex.Config = {
   client: "sqlite3",
   useNullAsDefault: true,
   connection: {
-    filename: "./src/database/app.db",
+    filename: path.resolve(__dirname, "..", env.DATABASE_URL),
   },
   migrations: {
     extension: "ts",

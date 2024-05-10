@@ -1,5 +1,5 @@
 import fastify from "fastify";
-import { userRoutes } from "./routes/user.routes";
+import { userRoutes } from "./routes/users.routes";
 import { mealsRoutes } from "./routes/meals.routes";
 import cookies from "@fastify/cookie";
 
