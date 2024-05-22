@@ -1,8 +1,6 @@
 import { config } from "dotenv";
 import { z } from "zod";
 
-console.log(process.env.NODE_ENV);
-
 if (process.env.NODE_ENV === "test") {
   config({ path: ".env.test" });
 } else {
@@ -16,8 +14,6 @@ const envSchema = z.object({
 });
 
 const envParsed = envSchema.safeParse(process.env);
-
-console.log(envParsed.data);
 
 if (!envParsed.success)
   throw new Error(`${JSON.stringify(envParsed.error.format())}`);
