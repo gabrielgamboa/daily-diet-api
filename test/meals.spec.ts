@@ -205,4 +205,38 @@ describe("Meals", () => {
 
     expect(newMeals.body.meals).toHaveLength(0);
   });
+
+  it("should be able to get meal metrics from user", async () => {
+    const userResponse = await request(app.server).post("/users").send({
+      name: "Gabriel",
+      email: "gabriel@gmail.com",
+    });
+    const cookies = userResponse.headers["set-cookie"];
+
+    await request(app.server).post("/meals").set("Cookie", cookies).send({
+      name: "Almoço",
+      description: "arroz, feijão, carne",
+      isOnDiet: true,
+      date: "2024-04-29 12:00:00",
+    });
+
+    await request(app.server).post("/meals").set("Cookie", cookies).send({
+      name: "Janta",
+      description: "lanche brabo",
+      isOnDiet: false,
+      date: "2024-04-29 21:00:00",
+    });
+
+    const metrics = await request(app.server)
+      .get("/meals/metrics")
+      .set("Cookie", cookies)
+      .expect(200);
+
+    expect(metrics.body).toEqual({
+      totalMealsRegistered: 2,
+      totalMealsRegisteredOnDiet: 1,
+      totalMealsRegisteredNotOnDiet: 1,
+      bestSequenceOnDiet: 1,
+    });
+  });
 });
